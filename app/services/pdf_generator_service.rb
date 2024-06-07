@@ -9,40 +9,39 @@ class PdfGeneratorService
   end
 
   def header
-    company_name = "otoz.ai"
     invoice_number = "Invoice #: ACS-04062024-222"
     date_issued = "Date: 04/06/2024"
     phone_label = "Phone:"
     email_label = "Email:"
-
-    @pdf.bounding_box([0, @pdf.cursor], width: @document_width) do
-      # Company name and logo
-      @pdf.font('Helvetica', style: :bold, size: 18) do
-        @pdf.text company_name, align: :left
-      end
-      @pdf.move_down 10
-      @pdf.image LOGO_IMG_PATH, at: [@document_width - 50, @pdf.cursor + 50], width: 50 if File.exist?(LOGO_IMG_PATH)
-      
-      # Phone and Email
-      @pdf.move_down 10
-      @pdf.font('Helvetica', size: 12) do
-        @pdf.text phone_label, align: :left
-        @pdf.text email_label, align: :left
-      end
-
-      # Invoice details
-      @pdf.bounding_box([@document_width - 200, @pdf.cursor + 50], width: 200) do
-        @pdf.font('Helvetica', style: :bold, size: 14) do
-          @pdf.text "INVOICE", align: :right
-        end
-        @pdf.move_down 10
-        @pdf.font('Helvetica', size: 12) do
-          @pdf.text invoice_number, align: :right
-          @pdf.text date_issued, align: :right
-        end
+  
+    @pdf.bounding_box([0, @pdf.cursor], width: @document_width, height: 100) do
+      if File.exist?(LOGO_IMG_PATH)
+        @pdf.image LOGO_IMG_PATH, width: @document_width, height: 100
       end
     end
-  end
+
+    @pdf.move_down 10
+
+    @pdf.bounding_box([0, @pdf.cursor], width: @document_width) do
+      @pdf.font('Helvetica', style: :bold, size: 14) do
+        @pdf.text "INVOICE", align: :center
+      end
+
+      @pdf.move_down 10
+
+      @pdf.font('Helvetica', size: 12) do
+        @pdf.text date_issued, align: :right
+        @pdf.text invoice_number, align: :right
+      end
+    end
+
+    @pdf.move_down 10
+
+    @pdf.font('Helvetica', size: 12) do
+      @pdf.text phone_label, align: :left
+      @pdf.text email_label, align: :left
+    end
+  end  
 
   def bill_to_section
     bill_to_data = [
