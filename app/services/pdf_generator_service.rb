@@ -7,6 +7,9 @@ class PdfGeneratorService
   def initialize
     @pdf = Prawn::Document.new
     @document_width = @pdf.bounds.width
+    @image1_path = 'app/assets/images/image1.png'
+    @image2_path = 'app/assets/images/image2.png'
+    @image3_path = 'app/assets/images/image3.png'
   end
 
   def header
@@ -15,28 +18,26 @@ class PdfGeneratorService
     phone_label = "Phone:"
     email_label = "Email:"
   
-    @pdf.bounding_box([0, @pdf.cursor], width: @document_width, height: 60) do
+    @pdf.bounding_box([0, @pdf.cursor], width: @document_width, height: 80) do
       if File.exist?(LOGO_IMG_PATH)
-        @pdf.image LOGO_IMG_PATH, width: @document_width, height: 60
+        @pdf.image LOGO_IMG_PATH, width: @document_width, height: 80
       end
     end
 
-    @pdf.move_down 5
+    @pdf.move_down 2
 
     @pdf.bounding_box([0, @pdf.cursor], width: @document_width) do
       @pdf.font('Helvetica', style: :bold, size: 12) do
-        @pdf.text "INVOICE", align: :center
+        @pdf.text "Advance Invoice (FOB)", align: :center
       end
 
-      @pdf.move_down 5
+      @pdf.move_down 2
 
       @pdf.font('Helvetica', size: 10) do
         @pdf.text date_issued, align: :right
         @pdf.text invoice_number, align: :right
       end
     end
-
-    @pdf.move_down 5
 
     @pdf.font('Helvetica', size: 10) do
       @pdf.text phone_label, align: :left
@@ -84,6 +85,23 @@ class PdfGeneratorService
       table.row(1..-1).border_right_width = 0
     end
   end
+
+  def vehicle_images
+    image_width = (@document_width - (3 * 20)) / 3  # Considering 20 as the total margin (10 on each side)
+  
+    # Create a bounding box to hold all three images
+    @pdf.bounding_box([0, @pdf.cursor], width: @document_width, height: 90) do
+      [@image1_path, @image2_path, @image3_path].each_with_index do |image_path, index|
+        if File.exist?(image_path)
+          x_position = index * (image_width + 20)
+  
+          @pdf.image image_path, at: [x_position + 10, @pdf.cursor - 10], width: image_width, height: 80
+        end
+      end
+    end
+  end
+  
+  
 
   def vehicle_details_section
     vehicle_details_data = [
@@ -195,7 +213,7 @@ class PdfGeneratorService
       table.row(1..-1).size = 8
     end
 
-    @pdf.move_down 5
+    @pdf.move_down 4
     @pdf.font('Helvetica', size: 10) do
       @pdf.text 'If you have any questions about this invoice, please contact inquiry@otoz.ai', align: :left
     end
@@ -203,22 +221,22 @@ class PdfGeneratorService
 
   def footer
   
-    @pdf.bounding_box([0, @pdf.cursor], width: @document_width, height: 60) do
-      if File.exist?(LOGO_IMG_PATH)
-        @pdf.image FOOTER_LOGO_IMG_PATH, width: @document_width, height: 60
+    @pdf.bounding_box([0, @pdf.cursor], width: @document_width, height: 30) do
+      if File.exist?(FOOTER_LOGO_IMG_PATH)
+        @pdf.image FOOTER_LOGO_IMG_PATH, width: @document_width, height: 30
       end
     end
   end  
   
   def generate_pdf
     header
-    @pdf.move_down 5
+    @pdf.move_down 2
     bill_to_section
-    @pdf.move_down 5
+    vehicle_images
+    @pdf.move_down 2
     vehicle_details_section
     payment_details_section
     bank_details_section
-    @pdf.move_down 5
     footer
     @pdf.render
   end
