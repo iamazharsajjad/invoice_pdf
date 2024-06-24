@@ -24,36 +24,34 @@ class PdfGeneratorService
       end
     end
 
-    @pdf.move_down 2
+    @pdf.move_down 6
 
     @pdf.bounding_box([0, @pdf.cursor], width: @document_width) do
-      @pdf.font('Helvetica', style: :bold, size: 12) do
+      @pdf.font('Helvetica', style: :bold, size: 25) do
         @pdf.text "Advance Invoice (FOB)", align: :center
       end
 
-      @pdf.move_down 2
+    @pdf.move_down 2
 
-      @pdf.font('Helvetica', size: 10) do
+    @pdf.font('Helvetica', size: 10) do
         @pdf.text date_issued, align: :right
         @pdf.text invoice_number, align: :right
       end
     end
-
-    @pdf.font('Helvetica', size: 10) do
-      @pdf.text phone_label, align: :left
-      @pdf.text email_label, align: :left
-    end
-  end  
+  end
 
   def bill_to_section
     bill_to_data = [
-      [{ content: "Bill To", background_color: 'D3D3D3', borders: [:top, :bottom, :left, :right] },
-       { content: "Port of Loading", background_color: 'D3D3D3', borders: [:top, :bottom, :left, :right] }],
-      ["Name:", "Port of Loading: \t Any Port of Japan"],
-      ["Phone#:", "Country of Origin: \t Japan"],
-      ["Email:", "Incoterms: \t 2010"],
-      ["City:", "P.O.D:"],
-      ["Country:", "Country:"]
+      [
+        { content: "Bill To", background_color: 'D3D3D3', borders: [:top, :bottom, :left, :right], colspan: 2, font_style: :bold, size: 10, align: :center },
+        { content: "", background_color: 'ffffff', borders: [], colspan: 1, font_style: :bold, size: 10, align: :center },
+        { content: "Port of Loading", background_color: 'D3D3D3', borders: [:top, :bottom, :left, :right], colspan: 2, font_style: :bold, size: 10, align: :center }
+      ],
+      [{ content: "Name:", colspan: 1 }, { content: "Sheldon Lee", colspan: 1 }, { content: "", colspan: 1 }, { content: "Port of Loading:", colspan: 1 }, { content: "Any Port of Japan", colspan: 1 }],
+      [{ content: "Phone#:", colspan: 1 }, { content: "66960824029", colspan: 1 }, { content: "", colspan: 1 }, { content: "Country of Origin:", colspan: 1 }, { content: "Japan", colspan: 1 }],
+      [{ content: "Email:", colspan: 1 }, { content: "sheldon@demo.com", colspan: 1 }, { content: "", colspan: 1 }, { content: "Incoterms:", colspan: 1 }, { content: "2010", colspan: 1 }],
+      [{ content: "City:", colspan: 1 }, { content: "MAE SOT", colspan: 1 }, { content: "", colspan: 1 }, { content: "P.O.D:", colspan: 1 }, { content: "Mombasa", colspan: 1 }],
+      [{ content: "Country:", colspan: 1 }, { content: "Kenya", colspan: 1 }, { content: "", colspan: 1 }, { content: "Country:", colspan: 1 }, { content: "Mombasa", colspan: 1 }]
     ]
   
     bill_to_options = {
@@ -68,12 +66,7 @@ class PdfGeneratorService
   
     @pdf.table(bill_to_data, bill_to_options) do |table|
       table.row(0).each do |cell|
-        cell.background_color = 'D3D3D3'
-        cell.font_style = :bold
-        cell.size = 10
-        cell.align = :center
         cell.padding = [5, 5, 5, 5]
-        cell.borders = [:top, :bottom, :left, :right]
       end
   
       table.row(0).column(0).borders = [:top, :bottom, :left, :right]
